@@ -1,7 +1,11 @@
 version: 2.1
 orbs:
   welcome: circleci/welcome-orb@0.4.1
+  maven: circleci/maven@0.0.12
 workflows:
   welcome:
     jobs:
       - welcome/run
+  maven_test:
+    jobs:
+      - maven/test
