@@ -1,11 +1,31 @@
 version: 2.1
+
 orbs:
-  welcome: circleci/welcome-orb@0.4.1
   maven: circleci/maven@0.0.12
+
+jobs:
+  deploy:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - run:
+          name: Deploy
+          command: echo 'Deploy'
+  sonar:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    steps:
+      - run:
+          name: Sonar
+          command: echo 'Sonar'
+
 workflows:
-  welcome:
-    jobs:
-      - welcome/run
-  maven_test:
+  main:
     jobs:
       - maven/test
+      - deploy:
+          requires:
+            - maven/test
+      - sonar:
+          requires:
+            - maven/test
