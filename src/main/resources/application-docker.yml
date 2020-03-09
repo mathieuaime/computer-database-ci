@@ -1,0 +1,10 @@
+spring:
+    jpa:
+        database: MYSQL
+        hibernate:
+            ddl-auto: update
+
+    datasource:
+        url: jdbc:mysql://db:3306/computer_database
+        username: root
+        password: password

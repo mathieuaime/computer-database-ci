@@ -1,0 +1,32 @@
+version: '3'
+services:
+  db:
+    restart: always
+    networks:
+      - backend-network
+    container_name: db
+    image: mysql/mysql-server:5.7
+    volumes:
+      - /data/computer_database
+    environment:
+      MYSQL_DATABASE: computer_database
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_HOST: '%'
+
+  computer-database:
+    restart: always
+    networks:
+      - backend-network
+    build:
+      context: .
+    ports:
+     - "8088:8088"
+    depends_on:
+      - db
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+networks:
+  backend-network:
+    driver: bridge
