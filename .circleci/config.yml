@@ -1,31 +1,13 @@
 version: 2.1
 
 orbs:
-  maven: circleci/maven@0.0.12
-
-jobs:
-  deploy:
-    docker:
-      - image: circleci/openjdk:8-jdk
-    steps:
-      - run:
-          name: Deploy
-          command: echo 'Deploy'
-  sonar:
-    docker:
-      - image: circleci/openjdk:8-jdk
-    steps:
-      - run:
-          name: Sonar
-          command: echo 'Sonar'
+  aws-ecr: circleci/aws-ecr@6.7.1
 
 workflows:
   main:
     jobs:
-      - maven/test
-      - deploy:
-          requires:
-            - maven/test
-      - sonar:
-          requires:
-            - maven/test
+      - aws-ecr/build-and-push-image:
+          create-repo: true
+          repo: "${AWS_RESOURCE_NAME_PREFIX}"
+          region: AWS_DEFAULT_REGION
+          tag: 'latest,${CIRCLE_SHA1}'
