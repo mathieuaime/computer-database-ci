@@ -30,6 +30,18 @@ jobs:
     steps:
       - run: echo "Release staging"
 
+  send_start_notification:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - run: echo "Sending a notification to the users"
+
+  send_end_notification:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - run: echo "Prod ok, let's have a beer"
+
 workflows:
   build-test-feature:
     jobs:
@@ -48,7 +60,6 @@ workflows:
                 - dev
           create-repo: true
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
-          region: AWS_DEFAULT_REGION
           tag: 'latest,${CIRCLE_SHA1}'
 
       - aws-ecs/deploy-service-update:
@@ -75,7 +86,6 @@ workflows:
                 - staging
           create-repo: true
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
-          region: AWS_DEFAULT_REGION
           tag: 'staging,${CIRCLE_SHA1}'
 
       - aws-ecs/deploy-service-update:
@@ -92,13 +102,11 @@ workflows:
       - release-staging:
           requires:
             - test-staging
-          filters:
-            branches:
-              only:
-                - staging
 
   build-test-deploy-prod:
     jobs:
+      - send_start_notification
+
       - aws-ecr/build-and-push-image:
           filters:
             branches:
@@ -106,7 +114,6 @@ workflows:
                 - master
           create-repo: true
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
-          region: AWS_DEFAULT_REGION
           tag: '1.0.0-RELEASE,${CIRCLE_SHA1}'
 
       - approval-prod:
@@ -120,3 +127,7 @@ workflows:
           family: "${AWS_RESOURCE_NAME_PREFIX}-service"
           cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster"
           container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SHA1}"
+
+      - send_end_notification:
+          requires:
+            - aws-ecs/deploy-service-update
