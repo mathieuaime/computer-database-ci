@@ -1,7 +1,8 @@
-package com.excilys.computerdatabase.controller;
+package com.excilys.computerdatabase.controller.rest;
 
-import com.excilys.computerdatabase.model.Computer;
 import com.excilys.computerdatabase.service.ComputerService;
+import com.excilys.computerdatabase.service.dto.ComputerDto;
+import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,32 +17,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/computer")
-public class ComputerController {
+@RequestMapping("/api/v1/computers")
+public class ComputerResource {
+
     private final ComputerService computerService;
 
-    public ComputerController(ComputerService computerService) {
+    public ComputerResource(ComputerService computerService) {
         this.computerService = computerService;
     }
 
     @GetMapping
-    public Page<Computer> find(Pageable pageable) {
+    public Page<ComputerDto> find(Pageable pageable) {
         return this.computerService.find(pageable);
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<Computer> findByUuid(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<ComputerDto> findByUuid(@PathVariable("uuid") String uuid) {
         return ResponseEntity.of(this.computerService.findByUuid(uuid));
     }
 
     @PostMapping
-    public ResponseEntity<Computer> create(@RequestBody Computer computer) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.computerService.save(computer));
+    public ResponseEntity<ComputerDto> create(@Valid @RequestBody ComputerDto computerDto) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(this.computerService.save(computerDto));
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<Computer> update(@RequestBody Computer computer) {
-        return ResponseEntity.ok(this.computerService.save(computer));
+    public ResponseEntity<ComputerDto> update(@Valid @RequestBody ComputerDto computerDto) {
+        return ResponseEntity.ok(this.computerService.save(computerDto));
     }
 
     @DeleteMapping("/{uuid}")

@@ -25,3 +25,11 @@ hs_err_pid*
 target/
 .idea/
 *.iml
+
+sample.properties
+sample.script
+
+.settings/
+.project
+.classpath
+.factorypath

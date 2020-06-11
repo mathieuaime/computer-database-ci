@@ -1,27 +1,22 @@
-package com.excilys.computerdatabase.model;
+package com.excilys.computerdatabase.service.dto;
 
 import java.util.Objects;
-import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
-@Entity
-public class Computer {
+public class ComputerDto {
 
-    @Id
-    private String uuid = UUID.randomUUID().toString();
+    private String uuid;
 
+    @NotNull
     private String name;
 
-    @ManyToOne
-    private Company company;
+    private CompanyDto company;
 
     public String getUuid() {
         return uuid;
     }
 
-    public Computer setUuid(String uuid) {
+    public ComputerDto setUuid(String uuid) {
         this.uuid = uuid;
         return this;
     }
@@ -30,16 +25,16 @@ public class Computer {
         return name;
     }
 
-    public Computer setName(String name) {
+    public ComputerDto setName(String name) {
         this.name = name;
         return this;
     }
 
-    public Company getCompany() {
+    public CompanyDto getCompany() {
         return company;
     }
 
-    public Computer setCompany(Company company) {
+    public ComputerDto setCompany(CompanyDto company) {
         this.company = company;
         return this;
     }
@@ -52,10 +47,10 @@ public class Computer {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Computer computer = (Computer) o;
-        return Objects.equals(uuid, computer.uuid) &&
-            Objects.equals(name, computer.name) &&
-            Objects.equals(company, computer.company);
+        ComputerDto that = (ComputerDto) o;
+        return Objects.equals(uuid, that.uuid) &&
+            Objects.equals(name, that.name) &&
+            Objects.equals(company, that.company);
     }
 
     @Override
@@ -65,7 +60,7 @@ public class Computer {
 
     @Override
     public String toString() {
-        return "Computer{" +
+        return "ComputerDto{" +
             "uuid='" + uuid + '\'' +
             ", name='" + name + '\'' +
             ", company=" + company +

@@ -5,10 +5,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.excilys.computerdatabase.model.Computer;
-import com.excilys.computerdatabase.persistence.ComputerDao;
+import com.excilys.computerdatabase.repository.ComputerRepository;
+import com.excilys.computerdatabase.service.dto.ComputerDto;
+import com.excilys.computerdatabase.service.mapper.ComputerMapper;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,8 +22,13 @@ import org.springframework.data.domain.Pageable;
 @ExtendWith(MockitoExtension.class)
 class ComputerServiceTest {
 
+    private static final String UUID = "uuid";
+
     @Mock
-    private ComputerDao computerDao;
+    private ComputerRepository computerRepository;
+
+    @Mock
+    private ComputerMapper computerMapper;
 
     @InjectMocks
     private ComputerService computerService;
@@ -30,55 +36,68 @@ class ComputerServiceTest {
     @Test
     void find() {
         Computer computer = new Computer();
-        when(this.computerDao.findAll(Pageable.unpaged())).thenReturn(
-                new PageImpl<>(Collections.singletonList(computer)));
+        when(computerRepository.findAll(Pageable.unpaged()))
+            .thenReturn(new PageImpl<>(Collections.singletonList(computer)));
 
-        Page<Computer> computers = this.computerService.find(Pageable.unpaged());
+        ComputerDto computerDto = new ComputerDto();
+        when(computerMapper.toDto(computer)).thenReturn(computerDto);
 
-        assertThat(computers).containsExactly(computer);
-        verify(this.computerDao).findAll(Pageable.unpaged());
+        Page<ComputerDto> computers = computerService.find(Pageable.unpaged());
+
+        assertThat(computers).containsExactly(computerDto);
     }
 
     @Test
     void findByUuid() {
         Computer computer = new Computer();
-        String uuid = UUID.randomUUID().toString();
-        when(this.computerDao.findById(uuid)).thenReturn(Optional.of(computer));
+        when(computerRepository.findById(UUID)).thenReturn(Optional.of(computer));
 
-        Optional<Computer> optComputer = this.computerService.findByUuid(uuid);
+        ComputerDto computerDto = new ComputerDto();
+        when(computerMapper.toDto(computer)).thenReturn(computerDto);
 
-        assertThat(optComputer).contains(computer);
-        verify(this.computerDao).findById(uuid);
+        Optional<ComputerDto> optComputer = computerService.findByUuid(UUID);
+
+        assertThat(optComputer).contains(computerDto);
     }
 
     @Test
     void findByCompany() {
         Computer computer = new Computer();
-        when(this.computerDao.findByCompany("company", Pageable.unpaged())).thenReturn(
-                new PageImpl<>(Collections.singletonList(computer)));
+        when(computerRepository.findByCompany_JDBCTemplate("company", Pageable.unpaged()))
+            .thenReturn(new PageImpl<>(Collections.singletonList(computer)));
 
-        Page<Computer> computers = this.computerService.findByCompany("company", Pageable.unpaged());
+        ComputerDto computerDto = new ComputerDto();
+        when(computerMapper.toDto(computer)).thenReturn(computerDto);
 
-        assertThat(computers).containsExactly(computer);
-        verify(this.computerDao).findByCompany("company", Pageable.unpaged());
+        Page<ComputerDto> computers = computerService.findByCompany("company", Pageable.unpaged());
+
+        assertThat(computers).containsExactly(computerDto);
     }
 
     @Test
     void save() {
         Computer computer = new Computer();
-        when(this.computerDao.save(computer)).thenReturn(computer);
+        Computer computerSaved = new Computer();
+        computerSaved.setUuid(UUID);
 
-        Computer computerSaved = this.computerService.save(computer);
+        when(computerRepository.save(computer)).thenReturn(computerSaved);
 
-        assertThat(computerSaved).isEqualTo(computer);
-        verify(this.computerDao).save(computer);
+        ComputerDto computerDto = new ComputerDto();
+        ComputerDto computerDtoSaved = new ComputerDto();
+        computerDtoSaved.setUuid(UUID);
+
+        when(computerMapper.toEntity(computerDto)).thenReturn(computer);
+        when(computerMapper.toDto(computerSaved)).thenReturn(computerDtoSaved);
+
+        ComputerDto saved = computerService.save(computerDto);
+
+        assertThat(saved).isEqualTo(computerDtoSaved);
     }
 
     @Test
     void delete() {
-        String uuid = UUID.randomUUID().toString();
-        this.computerService.delete(uuid);
+        computerService.delete(UUID);
 
-        verify(this.computerDao).deleteById(uuid);
+        verify(computerRepository).deleteById(UUID);
     }
 }

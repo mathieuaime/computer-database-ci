@@ -1,9 +1,10 @@
-package com.excilys.computerdatabase.controller;
+package com.excilys.computerdatabase.controller.rest;
 
-import com.excilys.computerdatabase.model.Company;
-import com.excilys.computerdatabase.model.Computer;
 import com.excilys.computerdatabase.service.CompanyService;
 import com.excilys.computerdatabase.service.ComputerService;
+import com.excilys.computerdatabase.service.dto.CompanyDto;
+import com.excilys.computerdatabase.service.dto.ComputerDto;
+import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,38 +19,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/company")
-public class CompanyController {
+@RequestMapping("/api/v1/companies")
+public class CompanyResource {
+
     private final CompanyService companyService;
     private final ComputerService computerService;
 
-    public CompanyController(CompanyService companyService, ComputerService computerService) {
+    public CompanyResource(CompanyService companyService, ComputerService computerService) {
         this.companyService = companyService;
         this.computerService = computerService;
     }
 
     @GetMapping
-    public Page<Company> find(Pageable pageable) {
+    public Page<CompanyDto> find(Pageable pageable) {
         return this.companyService.find(pageable);
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<Company> findByUuid(@PathVariable("uuid") String uuid) {
+    public ResponseEntity<CompanyDto> findByUuid(@PathVariable("uuid") String uuid) {
         return ResponseEntity.of(this.companyService.findByUuid(uuid));
     }
 
     @GetMapping("/{uuid}/computers")
-    public Page<Computer> findComputers(@PathVariable("uuid") String uuid, Pageable pageable) {
+    public Page<ComputerDto> findComputers(@PathVariable("uuid") String uuid, Pageable pageable) {
         return this.computerService.findByCompany(uuid, pageable);
     }
 
     @PostMapping
-    public ResponseEntity<Company> create(@RequestBody Company company) {
+    public ResponseEntity<CompanyDto> create(@Valid @RequestBody CompanyDto company) {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.companyService.save(company));
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<Company> update(@RequestBody Company company) {
+    public ResponseEntity<CompanyDto> update(@Valid @RequestBody CompanyDto company) {
         return ResponseEntity.ok(this.companyService.save(company));
     }
 

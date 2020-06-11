@@ -1,7 +1,9 @@
 package com.excilys.computerdatabase.service;
 
 import com.excilys.computerdatabase.model.Company;
-import com.excilys.computerdatabase.persistence.CompanyDao;
+import com.excilys.computerdatabase.repository.CompanyRepository;
+import com.excilys.computerdatabase.service.dto.CompanyDto;
+import com.excilys.computerdatabase.service.mapper.CompanyMapper;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,25 +11,30 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CompanyService {
-    private final CompanyDao companyDao;
 
-    public CompanyService(CompanyDao companyDao) {
-        this.companyDao = companyDao;
+    private final CompanyRepository companyRepository;
+    private final CompanyMapper companyMapper;
+
+    public CompanyService(CompanyRepository companyRepository, CompanyMapper companyMapper) {
+        this.companyRepository = companyRepository;
+        this.companyMapper = companyMapper;
     }
 
-    public Page<Company> find(Pageable pageable) {
-        return this.companyDao.findAll(pageable);
+    public Page<CompanyDto> find(Pageable pageable) {
+        return this.companyRepository.findAll(pageable).map(companyMapper::toDto);
     }
 
-    public Optional<Company> findByUuid(String uuid) {
-        return this.companyDao.findById(uuid);
+    public Optional<CompanyDto> findByUuid(String uuid) {
+        return this.companyRepository.findById(uuid).map(companyMapper::toDto);
     }
 
-    public Company save(Company company) {
-        return this.companyDao.save(company);
+    public CompanyDto save(CompanyDto companyDto) {
+        Company company = companyMapper.toEntity(companyDto);
+        company = this.companyRepository.save(company);
+        return companyMapper.toDto(company);
     }
 
     public void delete(String uuid) {
-        this.companyDao.deleteById(uuid);
+        this.companyRepository.deleteById(uuid);
     }
 }
