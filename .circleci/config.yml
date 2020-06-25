@@ -1,13 +1,122 @@
 version: 2.1
 
 orbs:
+  gradle: circleci/gradle@2.1.0
   aws-ecr: circleci/aws-ecr@6.7.1
+  aws-ecs: circleci/aws-ecs@1.1.0
+
+jobs:
+  test-dev:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - run: echo "Test dev"
+
+  merge-dev-into-staging:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - run: echo "Merge dev into staging"
+
+  test-staging:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - run: echo "Test staging"
+
+  release-staging:
+    docker:
+      - image: cimg/base:2020.01
+    steps:
+      - run: echo "Release staging"
 
 workflows:
-  main:
+  build-test-feature:
+    jobs:
+      - gradle/test:
+          filters:
+            branches:
+              only:
+                - /feature-.*/
+
+  build-test-deploy-dev:
     jobs:
       - aws-ecr/build-and-push-image:
+          filters:
+            branches:
+              only:
+                - dev
           create-repo: true
           repo: "${AWS_RESOURCE_NAME_PREFIX}"
           region: AWS_DEFAULT_REGION
           tag: 'latest,${CIRCLE_SHA1}'
+
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build-and-push-image
+          family: "${AWS_RESOURCE_NAME_PREFIX}-service"
+          cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster"
+          container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SHA1}"
+
+      - test-dev:
+          requires:
+            - aws-ecs/deploy-service-update
+
+      - merge-dev-into-staging:
+          requires:
+            - test-dev
+
+  release-deploy-staging:
+    jobs:
+      - aws-ecr/build-and-push-image:
+          filters:
+            branches:
+              only:
+                - staging
+          create-repo: true
+          repo: "${AWS_RESOURCE_NAME_PREFIX}"
+          region: AWS_DEFAULT_REGION
+          tag: 'staging,${CIRCLE_SHA1}'
+
+      - aws-ecs/deploy-service-update:
+          requires:
+            - aws-ecr/build-and-push-image
+          family: "${AWS_RESOURCE_NAME_PREFIX}-service"
+          cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster"
+          container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SHA1}"
+
+      - test-staging:
+          requires:
+            - aws-ecs/deploy-service-update
+
+      - release-staging:
+          requires:
+            - test-staging
+          filters:
+            branches:
+              only:
+                - staging
+
+  build-test-deploy-prod:
+    jobs:
+      - aws-ecr/build-and-push-image:
+          filters:
+            branches:
+              only:
+                - master
+          create-repo: true
+          repo: "${AWS_RESOURCE_NAME_PREFIX}"
+          region: AWS_DEFAULT_REGION
+          tag: '1.0.0-RELEASE,${CIRCLE_SHA1}'
+
+      - approval-prod:
+          requires:
+            - aws-ecr/build-and-push-image
+          type: approval
+
+      - aws-ecs/deploy-service-update:
+          requires:
+            - approval-prod
+          family: "${AWS_RESOURCE_NAME_PREFIX}-service"
+          cluster-name: "${AWS_RESOURCE_NAME_PREFIX}-cluster"
+          container-image-name-updates: "container=${AWS_RESOURCE_NAME_PREFIX}-service,tag=${CIRCLE_SHA1}"

@@ -1,22 +1,20 @@
-package com.excilys.computerdatabase.model;
+package com.excilys.computerdatabase.service.dto;
 
 import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
-@Entity
-public class Company {
+public class CompanyDto {
 
-    @Id
     private Long id;
 
+    @NotNull
     private String name;
 
     public Long getId() {
         return id;
     }
 
-    public Company setId(Long id) {
+    public CompanyDto setId(Long id) {
         this.id = id;
         return this;
     }
@@ -25,7 +23,7 @@ public class Company {
         return name;
     }
 
-    public Company setName(String name) {
+    public CompanyDto setName(String name) {
         this.name = name;
         return this;
     }
@@ -38,9 +36,9 @@ public class Company {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Company company = (Company) o;
-        return Objects.equals(id, company.id) &&
-            Objects.equals(name, company.name);
+        CompanyDto that = (CompanyDto) o;
+        return Objects.equals(id, that.id) &&
+            Objects.equals(name, that.name);
     }
 
     @Override
@@ -50,7 +48,7 @@ public class Company {
 
     @Override
     public String toString() {
-        return "Company{" +
+        return "CompanyDto{" +
             "uuid='" + id + '\'' +
             ", name='" + name + '\'' +
             '}';

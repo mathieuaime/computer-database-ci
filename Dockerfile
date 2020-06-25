@@ -1,4 +1,4 @@
-FROM maven:3.5.2-jdk-8-alpine AS MAVEN_BUILDER
+FROM maven:3.6.3-jdk-13 AS MAVEN_BUILDER
 
 COPY pom.xml /tmp/
 
@@ -10,7 +10,7 @@ RUN mvn package
 
 
 
-FROM adoptopenjdk/openjdk8:alpine-slim
+FROM adoptopenjdk/openjdk13:alpine-jre
 
 LABEL maintainer="aime.mathieu1@gmail.com"
 
