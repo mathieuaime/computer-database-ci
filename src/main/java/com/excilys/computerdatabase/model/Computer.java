@@ -1,28 +1,29 @@
 package com.excilys.computerdatabase.model;
 
 import java.util.Objects;
-import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class Computer {
-
     @Id
-    private String uuid = UUID.randomUUID().toString();
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String name;
 
     @ManyToOne
     private Company company;
 
-    public String getUuid() {
-        return uuid;
+    public Long getId() {
+        return id;
     }
 
-    public Computer setUuid(String uuid) {
-        this.uuid = uuid;
+    public Computer setId(Long id) {
+        this.id = id;
         return this;
     }
 
@@ -53,20 +54,20 @@ public class Computer {
             return false;
         }
         Computer computer = (Computer) o;
-        return Objects.equals(uuid, computer.uuid) &&
+        return Objects.equals(id, computer.id) &&
             Objects.equals(name, computer.name) &&
             Objects.equals(company, computer.company);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, name, company);
+        return Objects.hash(id, name, company);
     }
 
     @Override
     public String toString() {
         return "Computer{" +
-            "uuid='" + uuid + '\'' +
+            "uuid='" + id + '\'' +
             ", name='" + name + '\'' +
             ", company=" + company +
             '}';

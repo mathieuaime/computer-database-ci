@@ -1,6 +1,8 @@
 package com.excilys.computerdatabase.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -22,7 +24,7 @@ import org.springframework.data.domain.Pageable;
 @ExtendWith(MockitoExtension.class)
 class ComputerServiceTest {
 
-    private static final String UUID = "uuid";
+    private static final long ID = 1L;
 
     @Mock
     private ComputerRepository computerRepository;
@@ -50,26 +52,28 @@ class ComputerServiceTest {
     @Test
     void findByUuid() {
         Computer computer = new Computer();
-        when(computerRepository.findById(UUID)).thenReturn(Optional.of(computer));
+        when(computerRepository.findById(ID)).thenReturn(Optional.of(computer));
 
         ComputerDto computerDto = new ComputerDto();
         when(computerMapper.toDto(computer)).thenReturn(computerDto);
 
-        Optional<ComputerDto> optComputer = computerService.findByUuid(UUID);
+        Optional<ComputerDto> optComputer = computerService.findById(ID);
 
         assertThat(optComputer).contains(computerDto);
     }
 
     @Test
     void findByCompany() {
+        int companyId = 1;
         Computer computer = new Computer();
-        when(computerRepository.findByCompany_JDBCTemplate("company", Pageable.unpaged()))
+
+        when(computerRepository.findByCompany(companyId, Pageable.unpaged()))
             .thenReturn(new PageImpl<>(Collections.singletonList(computer)));
 
         ComputerDto computerDto = new ComputerDto();
         when(computerMapper.toDto(computer)).thenReturn(computerDto);
 
-        Page<ComputerDto> computers = computerService.findByCompany("company", Pageable.unpaged());
+        Page<ComputerDto> computers = computerService.findByCompany(companyId, Pageable.unpaged());
 
         assertThat(computers).containsExactly(computerDto);
     }
@@ -77,14 +81,12 @@ class ComputerServiceTest {
     @Test
     void save() {
         Computer computer = new Computer();
-        Computer computerSaved = new Computer();
-        computerSaved.setUuid(UUID);
+        Computer computerSaved = new Computer().setId(ID);
 
         when(computerRepository.save(computer)).thenReturn(computerSaved);
 
         ComputerDto computerDto = new ComputerDto();
-        ComputerDto computerDtoSaved = new ComputerDto();
-        computerDtoSaved.setUuid(UUID);
+        ComputerDto computerDtoSaved = new ComputerDto().setId(ID);
 
         when(computerMapper.toEntity(computerDto)).thenReturn(computer);
         when(computerMapper.toDto(computerSaved)).thenReturn(computerDtoSaved);
@@ -95,9 +97,19 @@ class ComputerServiceTest {
     }
 
     @Test
-    void delete() {
-        computerService.delete(UUID);
+    void delete_whenNotFound_shouldDoNothing() {
+        computerService.delete(ID);
 
-        verify(computerRepository).deleteById(UUID);
+        verify(computerRepository, never()).delete(any());
+    }
+
+    @Test
+    void delete_whenFound_shouldDelete() {
+        Computer computer = new Computer();
+
+        when(computerRepository.findById(ID)).thenReturn(Optional.of(computer));
+        computerService.delete(ID);
+
+        verify(computerRepository).delete(computer);
     }
 }

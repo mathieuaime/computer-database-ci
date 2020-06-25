@@ -1,6 +1,6 @@
-INSERT INTO company(uuid, name) VALUES
-('company-uuid-1', 'company-1');
+INSERT INTO company(id, name) VALUES
+(1, 'company-1');
 
-INSERT INTO computer(uuid, name, company_uuid) VALUES
-('computer-uuid-1', 'computer-1', 'company-uuid-1'),
-('computer-uuid-2', 'computer-2', 'company-uuid-1');
+INSERT INTO computer(id, name, company_id) VALUES
+(1, 'computer-1', 1),
+(2, 'computer-2', 1);

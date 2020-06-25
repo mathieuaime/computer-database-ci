@@ -24,12 +24,12 @@ public class ComputerService {
         return this.computerRepository.findAll(pageable).map(computerMapper::toDto);
     }
 
-    public Optional<ComputerDto> findByUuid(String uuid) {
-        return this.computerRepository.findById(uuid).map(computerMapper::toDto);
+    public Optional<ComputerDto> findById(long id) {
+        return this.computerRepository.findById(id).map(computerMapper::toDto);
     }
 
-    public Page<ComputerDto> findByCompany(String uuid, Pageable pageable) {
-        return this.computerRepository.findByCompany_JDBCTemplate(uuid, pageable).map(computerMapper::toDto);
+    public Page<ComputerDto> findByCompany(long id, Pageable pageable) {
+        return this.computerRepository.findByCompany(id, pageable).map(computerMapper::toDto);
     }
 
     public ComputerDto save(ComputerDto computerDto) {
@@ -38,7 +38,7 @@ public class ComputerService {
         return computerMapper.toDto(computer);
     }
 
-    public void delete(String uuid) {
-        this.computerRepository.deleteById(uuid);
+    public void delete(long id) {
+        computerRepository.findById(id).ifPresent(computerRepository::delete);
     }
 }

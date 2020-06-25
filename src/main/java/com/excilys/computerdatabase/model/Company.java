@@ -1,7 +1,6 @@
 package com.excilys.computerdatabase.model;
 
 import java.util.Objects;
-import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -9,16 +8,16 @@ import javax.persistence.Id;
 public class Company {
 
     @Id
-    private String uuid = UUID.randomUUID().toString();
+    private Long id;
 
     private String name;
 
-    public String getUuid() {
-        return uuid;
+    public Long getId() {
+        return id;
     }
 
-    public Company setUuid(String uuid) {
-        this.uuid = uuid;
+    public Company setId(Long id) {
+        this.id = id;
         return this;
     }
 
@@ -40,19 +39,19 @@ public class Company {
             return false;
         }
         Company company = (Company) o;
-        return Objects.equals(uuid, company.uuid) &&
+        return Objects.equals(id, company.id) &&
             Objects.equals(name, company.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, name);
+        return Objects.hash(id, name);
     }
 
     @Override
     public String toString() {
         return "Company{" +
-            "uuid='" + uuid + '\'' +
+            "uuid='" + id + '\'' +
             ", name='" + name + '\'' +
             '}';
     }

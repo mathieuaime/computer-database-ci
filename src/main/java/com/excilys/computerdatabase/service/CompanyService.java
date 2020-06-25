@@ -1,6 +1,5 @@
 package com.excilys.computerdatabase.service;
 
-import com.excilys.computerdatabase.model.Company;
 import com.excilys.computerdatabase.repository.CompanyRepository;
 import com.excilys.computerdatabase.service.dto.CompanyDto;
 import com.excilys.computerdatabase.service.mapper.CompanyMapper;
@@ -24,17 +23,7 @@ public class CompanyService {
         return this.companyRepository.findAll(pageable).map(companyMapper::toDto);
     }
 
-    public Optional<CompanyDto> findByUuid(String uuid) {
-        return this.companyRepository.findById(uuid).map(companyMapper::toDto);
-    }
-
-    public CompanyDto save(CompanyDto companyDto) {
-        Company company = companyMapper.toEntity(companyDto);
-        company = this.companyRepository.save(company);
-        return companyMapper.toDto(company);
-    }
-
-    public void delete(String uuid) {
-        this.companyRepository.deleteById(uuid);
+    public Optional<CompanyDto> findById(long id) {
+        return this.companyRepository.findById(id).map(companyMapper::toDto);
     }
 }

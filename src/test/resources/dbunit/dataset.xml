@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<dataset>
-  <company uuid='company-uuid-1' name='company-1'/>
-
-  <computer uuid='computer-uuid-1' name='computer-1' company_uuid='company-uuid-1'/>
-  <computer uuid='computer-uuid-2' name='computer-2' company_uuid='company-uuid-1'/>
-</dataset>

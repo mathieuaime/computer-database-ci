@@ -1,44 +1,51 @@
 package com.excilys.computerdatabase.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import com.excilys.computerdatabase.model.Company;
 import com.excilys.computerdatabase.repository.CompanyRepository;
 import com.excilys.computerdatabase.service.dto.CompanyDto;
-import com.excilys.computerdatabase.service.fake.FakeCompanyMapper;
-import com.excilys.computerdatabase.service.fake.FakeCompanyRepository;
 import com.excilys.computerdatabase.service.mapper.CompanyMapper;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class CompanyServiceTest {
 
-    public static final Company COMPANY = new Company().setUuid("uuid").setName("name");
-    public static final CompanyDto COMPANY_DTO = new CompanyDto().setUuid("uuid").setName("name");
+    @Mock
+    private CompanyRepository companyRepository;
 
+    @Mock
+    private CompanyMapper companyMapper;
+
+    @InjectMocks
     private CompanyService companyService;
-
-    @BeforeEach
-    void setUp() {
-        CompanyMapper companyMapper = new FakeCompanyMapper(COMPANY, COMPANY_DTO);
-        CompanyRepository companyRepository = new FakeCompanyRepository(COMPANY);
-
-        companyService = new CompanyService(companyRepository, companyMapper);
-    }
 
     @Test
     void findByUuid_notFound() {
-        Optional<CompanyDto> optCompany = companyService.findByUuid("uuid-unknown");
+        long id = 0;
+        when(companyRepository.findById(id)).thenReturn(Optional.empty());
+
+        Optional<CompanyDto> optCompany = companyService.findById(id);
 
         assertThat(optCompany).isEmpty();
     }
 
     @Test
     void findByUuid() {
-        Optional<CompanyDto> optCompany = companyService.findByUuid("uuid");
+        long id = 1;
+        Company company = new Company();
+        when(companyRepository.findById(id)).thenReturn(Optional.of(company));
+        CompanyDto companyDto = new CompanyDto();
+        when(companyMapper.toDto(company)).thenReturn(companyDto);
 
-        assertThat(optCompany).contains(COMPANY_DTO);
+        Optional<CompanyDto> optCompany = companyService.findById(id);
+
+        assertThat(optCompany).contains(companyDto);
     }
-
 }

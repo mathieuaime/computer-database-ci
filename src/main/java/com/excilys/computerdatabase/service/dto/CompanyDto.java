@@ -5,17 +5,17 @@ import javax.validation.constraints.NotNull;
 
 public class CompanyDto {
 
-    private String uuid;
+    private Long id;
 
     @NotNull
     private String name;
 
-    public String getUuid() {
-        return uuid;
+    public Long getId() {
+        return id;
     }
 
-    public CompanyDto setUuid(String uuid) {
-        this.uuid = uuid;
+    public CompanyDto setId(Long id) {
+        this.id = id;
         return this;
     }
 
@@ -37,19 +37,19 @@ public class CompanyDto {
             return false;
         }
         CompanyDto that = (CompanyDto) o;
-        return Objects.equals(uuid, that.uuid) &&
+        return Objects.equals(id, that.id) &&
             Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, name);
+        return Objects.hash(id, name);
     }
 
     @Override
     public String toString() {
         return "CompanyDto{" +
-            "uuid='" + uuid + '\'' +
+            "uuid='" + id + '\'' +
             ", name='" + name + '\'' +
             '}';
     }

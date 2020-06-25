@@ -5,19 +5,19 @@ import javax.validation.constraints.NotNull;
 
 public class ComputerDto {
 
-    private String uuid;
+    private Long id;
 
     @NotNull
     private String name;
 
     private CompanyDto company;
 
-    public String getUuid() {
-        return uuid;
+    public Long getId() {
+        return id;
     }
 
-    public ComputerDto setUuid(String uuid) {
-        this.uuid = uuid;
+    public ComputerDto setId(Long id) {
+        this.id = id;
         return this;
     }
 
@@ -48,20 +48,20 @@ public class ComputerDto {
             return false;
         }
         ComputerDto that = (ComputerDto) o;
-        return Objects.equals(uuid, that.uuid) &&
+        return Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(company, that.company);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, name, company);
+        return Objects.hash(id, name, company);
     }
 
     @Override
     public String toString() {
         return "ComputerDto{" +
-            "uuid='" + uuid + '\'' +
+            "uuid='" + id + '\'' +
             ", name='" + name + '\'' +
             ", company=" + company +
             '}';
