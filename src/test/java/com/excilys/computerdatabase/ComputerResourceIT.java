@@ -7,8 +7,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.excilys.computerdatabase.model.Company;
 import com.excilys.computerdatabase.model.Computer;
 import com.excilys.computerdatabase.repository.ComputerRepository;
+import com.excilys.computerdatabase.service.dto.CompanyDto;
 import com.excilys.computerdatabase.service.dto.ComputerDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
@@ -60,8 +62,9 @@ class ComputerResourceIT {
   public void create() throws Exception {
     long dbSizeBeforeCreation = computerRepository.count();
 
+    CompanyDto companyDto = CompanyDto.builder().id(1L).build();
     ComputerDto computerDtoToSave =
-        ComputerDto.builder().name("name").introduced(Instant.now()).build();
+        ComputerDto.builder().name("name").introduced(Instant.now()).company(companyDto).build();
 
     MockHttpServletRequestBuilder builder = post("/api/v1/computers")
         .content(objectMapper.writeValueAsString(computerDtoToSave))
@@ -86,14 +89,21 @@ class ComputerResourceIT {
 
   @Test
   public void update() throws Exception {
-    Computer created = new Computer().setName("name");
+    Company company = new Company().setId(1L);
+
+    Computer created =
+        new Computer().setName("name-to-update").setIntroduced(Instant.now()).setCompany(company);
     computerRepository.save(created);
 
     long dbSizeBeforeCreation = computerRepository.count();
 
-    ComputerDto computerDtoToSave =
-        ComputerDto.builder().id(created.getId()).name("name-updated").introduced(Instant.now())
-            .build();
+    CompanyDto companyDto = CompanyDto.builder().id(1L).build();
+    ComputerDto computerDtoToSave = ComputerDto.builder()
+        .id(created.getId())
+        .name("name-updated")
+        .introduced(Instant.now())
+        .company(companyDto)
+        .build();
 
     MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", created.getId())
         .content(objectMapper.writeValueAsString(computerDtoToSave))

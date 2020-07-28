@@ -9,4 +9,11 @@
       <column name="name" type="string"/>
     </loadData>
   </changeSet>
+
+  <changeSet author="admin" id="test-3" context="test">
+    <loadData file="db/data/company-test.csv" separator=";" tableName="company">
+      <column name="id" type="numeric"/>
+      <column name="name" type="string"/>
+    </loadData>
+  </changeSet>
 </databaseChangeLog>

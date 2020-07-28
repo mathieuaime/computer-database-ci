@@ -27,8 +27,7 @@ public class ComputerView extends VerticalLayout {
   private final Grid<ComputerDto> grid;
   private final TextField filter;
   private final DateTimeFormatter formatter =
-      DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
-          .withZone(ZoneId.systemDefault());
+      DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withZone(ZoneId.systemDefault());
 
   public ComputerView(ComputerService computerService, ComputerEditor editor) {
     this.computerService = computerService;

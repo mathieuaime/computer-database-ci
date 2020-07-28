@@ -12,4 +12,14 @@
       <column name="company_id" type="numeric"/>
     </loadData>
   </changeSet>
+
+  <changeSet author="admin" id="test-4" context="test">
+    <loadData file="db/data/computer-test.csv" separator=";" tableName="computer">
+      <column name="id" type="numeric"/>
+      <column name="name" type="string"/>
+      <column name="introduced" type="date"/>
+      <column name="discontinued" type="date"/>
+      <column name="company_id" type="numeric"/>
+    </loadData>
+  </changeSet>
 </databaseChangeLog>
