@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+  <changeSet author="admin" id="2">
+    <createTable tableName="computer">
+      <column autoIncrement="true" name="id" type="bigint">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="varchar(255)">
+        <constraints unique="true" nullable="false"/>
+      </column>
+      <column name="introduced" type="timestamp">
+        <constraints nullable="false"/>
+      </column>
+      <column name="discontinued" type="timestamp"/>
+      <column name="company_id" type="bigint">
+        <constraints nullable="false" foreignKeyName="fk_computer_company"
+          references="company(id)"/>
+      </column>
+    </createTable>
+
+    <rollback>
+      <dropTable tableName="computer"/>
+    </rollback>
+  </changeSet>
+</databaseChangeLog>

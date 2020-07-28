@@ -8,10 +8,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.excilys.computerdatabase.repository.CompanyRepository;
+import com.excilys.computerdatabase.repository.ComputerRepository;
 import com.excilys.computerdatabase.service.CompanyService;
 import com.excilys.computerdatabase.service.ComputerService;
 import com.excilys.computerdatabase.service.dto.CompanyDto;
 import com.excilys.computerdatabase.service.dto.ComputerDto;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -28,9 +31,9 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CompanyResource.class)
 class CompanyResourceTest {
-
-  private static final CompanyDto COMPANY_DTO = new CompanyDto().setId(1L).setName("name");
-  private static final ComputerDto COMPUTER_DTO = new ComputerDto().setId(1L).setName("c-name");
+  private static final CompanyDto COMPANY_DTO = new CompanyDto(1L, "name");
+  private static final ComputerDto COMPUTER_DTO =
+      ComputerDto.builder().id(1L).name("c-name").introduced(Instant.now()).build();
 
   @Autowired
   private MockMvc mockMvc;
@@ -40,6 +43,12 @@ class CompanyResourceTest {
 
   @MockBean
   private ComputerService computerService;
+
+  @MockBean
+  private CompanyRepository companyRepository;
+
+  @MockBean
+  private ComputerRepository computerRepository;
 
   @Test
   public void findAll() throws Exception {

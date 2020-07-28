@@ -50,3 +50,5 @@ sample.properties
 sample.script
 
 target/
+
+node_modules/

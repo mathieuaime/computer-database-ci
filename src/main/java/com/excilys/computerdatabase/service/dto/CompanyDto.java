@@ -1,31 +1,31 @@
 package com.excilys.computerdatabase.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Objects;
 import javax.validation.constraints.NotNull;
 
 public class CompanyDto {
-
-    private Long id;
+    private final Long id;
 
     @NotNull
-    private String name;
+    private final String name;
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    @JsonCreator
+    public CompanyDto(Long id, @NotNull String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public Long getId() {
         return id;
     }
 
-    public CompanyDto setId(Long id) {
-        this.id = id;
-        return this;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public CompanyDto setName(String name) {
-        this.name = name;
-        return this;
     }
 
     @Override
@@ -52,5 +52,27 @@ public class CompanyDto {
             "uuid='" + id + '\'' +
             ", name='" + name + '\'' +
             '}';
+    }
+
+    public static class Builder {
+        private Long id;
+        private String name;
+
+        private Builder() {
+        }
+
+        public Builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public CompanyDto build() {
+            return new CompanyDto(this.id, this.name);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.excilys.computerdatabase.model;
 
+import java.time.Instant;
 import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,10 @@ public class Computer {
     private Long id;
 
     private String name;
+
+    private Instant introduced;
+
+    private Instant discontinued;
 
     @ManyToOne
     private Company company;
@@ -33,6 +38,24 @@ public class Computer {
 
     public Computer setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public Instant getIntroduced() {
+        return introduced;
+    }
+
+    public Computer setIntroduced(Instant introduced) {
+        this.introduced = introduced;
+        return this;
+    }
+
+    public Instant getDiscontinued() {
+        return discontinued;
+    }
+
+    public Computer setDiscontinued(Instant discontinued) {
+        this.discontinued = discontinued;
         return this;
     }
 
@@ -56,19 +79,23 @@ public class Computer {
         Computer computer = (Computer) o;
         return Objects.equals(id, computer.id) &&
             Objects.equals(name, computer.name) &&
+            Objects.equals(introduced, computer.introduced) &&
+            Objects.equals(discontinued, computer.discontinued) &&
             Objects.equals(company, computer.company);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, company);
+        return Objects.hash(id, name, introduced, discontinued, company);
     }
 
     @Override
     public String toString() {
         return "Computer{" +
-            "uuid='" + id + '\'' +
+            "id=" + id +
             ", name='" + name + '\'' +
+            ", introduced=" + introduced +
+            ", discontinued=" + discontinued +
             ", company=" + company +
             '}';
     }

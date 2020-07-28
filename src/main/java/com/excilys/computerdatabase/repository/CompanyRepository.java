@@ -1,13 +1,15 @@
 package com.excilys.computerdatabase.repository;
 
 import com.excilys.computerdatabase.model.Company;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface CompanyRepository extends JpaRepository<Company, Long> {
+  <T> Page<T> findByNameStartsWithIgnoreCase(String filter, Pageable pageable, Class<T> projection);
 
-  Page<Company> findByName(String name, Pageable pageable);
+  <T> Page<T> findProjectedBy(Pageable pageable, Class<T> projection);
+
+  <T> Optional<T> findById(long id, Class<T> projection);
 }

@@ -11,6 +11,7 @@ import com.excilys.computerdatabase.model.Computer;
 import com.excilys.computerdatabase.repository.ComputerRepository;
 import com.excilys.computerdatabase.service.dto.ComputerDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,8 @@ class ComputerResourceIT {
   public void create() throws Exception {
     long dbSizeBeforeCreation = computerRepository.count();
 
-    ComputerDto computerDtoToSave = new ComputerDto().setName("name");
+    ComputerDto computerDtoToSave =
+        ComputerDto.builder().name("name").introduced(Instant.now()).build();
 
     MockHttpServletRequestBuilder builder = post("/api/v1/computers")
         .content(objectMapper.writeValueAsString(computerDtoToSave))
@@ -89,7 +91,9 @@ class ComputerResourceIT {
 
     long dbSizeBeforeCreation = computerRepository.count();
 
-    ComputerDto computerDtoToSave = new ComputerDto().setName("name-updated");
+    ComputerDto computerDtoToSave =
+        ComputerDto.builder().id(created.getId()).name("name-updated").introduced(Instant.now())
+            .build();
 
     MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", created.getId())
         .content(objectMapper.writeValueAsString(computerDtoToSave))

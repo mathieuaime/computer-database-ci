@@ -43,9 +43,10 @@ public class ComputerResource {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ComputerDto> update(@PathVariable("id") long id,
-        @Valid @RequestBody ComputerDto computerDto) {
-        computerDto.setId(id);
+    public ResponseEntity<ComputerDto> update(@Valid @RequestBody ComputerDto computerDto) {
+        if (computerDto.getId() == null) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(this.computerService.save(computerDto));
     }
 

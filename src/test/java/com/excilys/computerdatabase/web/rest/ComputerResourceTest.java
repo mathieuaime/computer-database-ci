@@ -11,10 +11,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.excilys.computerdatabase.repository.CompanyRepository;
+import com.excilys.computerdatabase.repository.ComputerRepository;
 import com.excilys.computerdatabase.service.ComputerService;
 import com.excilys.computerdatabase.service.dto.CompanyDto;
 import com.excilys.computerdatabase.service.dto.ComputerDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -31,12 +34,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ComputerResource.class)
 class ComputerResourceTest {
-
     private static final CompanyDto COMPANY_DTO =
-        new CompanyDto().setId(1L).setName("c-name");
+        new CompanyDto(1L, "c-name");
 
     private static final ComputerDto COMPUTER_DTO =
-        new ComputerDto().setId(1L).setName("name").setCompany(COMPANY_DTO);
+        new ComputerDto(1L, "name", Instant.now(), null, COMPANY_DTO);
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -46,6 +48,12 @@ class ComputerResourceTest {
 
     @MockBean
     private ComputerService computerService;
+
+    @MockBean
+    private CompanyRepository companyRepository;
+
+    @MockBean
+    private ComputerRepository computerRepository;
 
     @Test
     public void findAll() throws Exception {
@@ -97,7 +105,7 @@ class ComputerResourceTest {
 
     @Test
     public void create_withoutName() throws Exception {
-        ComputerDto computerDtoToSave = new ComputerDto();
+        ComputerDto computerDtoToSave = ComputerDto.builder().build();
 
         MockHttpServletRequestBuilder builder = post("/api/v1/computers")
             .content(objectMapper.writeValueAsString(computerDtoToSave))
@@ -109,7 +117,8 @@ class ComputerResourceTest {
 
     @Test
     public void create() throws Exception {
-        ComputerDto computerDtoToSave = new ComputerDto().setName("name");
+        ComputerDto computerDtoToSave =
+            ComputerDto.builder().name("name").introduced(Instant.now()).build();
         when(computerService.save(computerDtoToSave)).thenReturn(COMPUTER_DTO);
 
         MockHttpServletRequestBuilder builder = post("/api/v1/computers")
@@ -124,7 +133,7 @@ class ComputerResourceTest {
     @Test
     public void update_withoutName() throws Exception {
         long id = 1;
-        ComputerDto computerDtoToSave = new ComputerDto().setId(id);
+        ComputerDto computerDtoToSave = ComputerDto.builder().id(id).build();
 
         MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", id)
             .content(objectMapper.writeValueAsString(computerDtoToSave))
