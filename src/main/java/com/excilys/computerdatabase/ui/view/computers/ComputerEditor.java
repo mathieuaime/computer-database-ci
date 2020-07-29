@@ -16,16 +16,16 @@ import com.vaadin.flow.spring.annotation.UIScope;
 @SpringComponent
 @UIScope
 public class ComputerEditor extends VerticalLayout implements KeyNotifier {
-  private final ComputerService computerService;
+  private final transient ComputerService computerService;
 
-  private ComputerDto computerDto;
+  private transient ComputerDto computerDto;
 
   TextField name = new TextField("Name");
 
-  Button save = new Button("Save", VaadinIcon.CHECK.create());
-  Button cancel = new Button("Cancel");
-  Button delete = new Button("Delete", VaadinIcon.TRASH.create());
-  HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
+  Button saveButton = new Button("Save", VaadinIcon.CHECK.create());
+  Button cancelButton = new Button("Cancel");
+  Button deleteButton = new Button("Delete", VaadinIcon.TRASH.create());
+  HorizontalLayout actions = new HorizontalLayout(saveButton, cancelButton, deleteButton);
 
   Binder<ComputerDto> binder = new Binder<>(ComputerDto.class);
 
@@ -40,14 +40,14 @@ public class ComputerEditor extends VerticalLayout implements KeyNotifier {
 
     setSpacing(true);
 
-    save.getElement().getThemeList().add("primary");
-    delete.getElement().getThemeList().add("error");
+    saveButton.getElement().getThemeList().add("primary");
+    deleteButton.getElement().getThemeList().add("error");
 
     addKeyPressListener(Key.ENTER, e -> save());
 
-    save.addClickListener(e -> save());
-    delete.addClickListener(e -> delete());
-    cancel.addClickListener(e -> setVisible(false));
+    saveButton.addClickListener(e -> save());
+    deleteButton.addClickListener(e -> delete());
+    cancelButton.addClickListener(e -> setVisible(false));
     setVisible(false);
   }
 
@@ -70,15 +70,15 @@ public class ComputerEditor extends VerticalLayout implements KeyNotifier {
       setVisible(false);
       return;
     }
-    final boolean persisted = c.getId() != null;
+    boolean persisted = c.getId() != null;
 
     if (persisted) {
-      computerDto = computerService.findById(c.getId()).get();
+      computerDto = computerService.findById(c.getId()).orElse(c);
     } else {
       computerDto = c;
     }
 
-    cancel.setVisible(persisted);
+    cancelButton.setVisible(persisted);
     binder.setBean(computerDto);
     setVisible(true);
     name.focus();
