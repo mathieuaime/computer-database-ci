@@ -50,8 +50,4 @@ public class ComputerService {
     public void delete(long id) {
         this.computerRepository.findById(id).ifPresent(this.computerRepository::delete);
     }
-
-    public long count() {
-        return this.computerRepository.count();
-    }
 }

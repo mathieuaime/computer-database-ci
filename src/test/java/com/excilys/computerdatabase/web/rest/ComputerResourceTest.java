@@ -136,6 +136,19 @@ class ComputerResourceTest {
   }
 
   @Test
+  void update_withoutId() throws Exception {
+    ComputerDto computerDtoToSave =
+        ComputerDto.builder().name("name").introduced(Instant.now()).build();
+
+    MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", 1)
+        .content(objectMapper.writeValueAsString(computerDtoToSave))
+        .contentType(MediaType.APPLICATION_JSON);
+
+    mockMvc.perform(builder)
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
   void update() throws Exception {
     when(computerService.save(COMPUTER_DTO)).thenReturn(COMPUTER_DTO);
 

@@ -78,6 +78,20 @@ class ComputerServiceTest {
   }
 
   @Test
+  void search() {
+    String filter = "filter";
+    ComputerProjection projection = mock(ComputerProjection.class);
+    when(computerRepository
+        .findByNameStartsWithIgnoreCase(filter, Pageable.unpaged(), ComputerProjection.class))
+        .thenReturn(new PageImpl<>(Collections.singletonList(projection)));
+    when(computerMapper.fromProjectionToDto(projection)).thenReturn(COMPUTER_DTO);
+
+    Page<ComputerDto> computers = computerService.search(filter, Pageable.unpaged());
+
+    assertThat(computers).containsExactly(COMPUTER_DTO);
+  }
+
+  @Test
   void save() {
     Computer computer = new Computer();
     Computer computerSaved = new Computer().setId(ID);
