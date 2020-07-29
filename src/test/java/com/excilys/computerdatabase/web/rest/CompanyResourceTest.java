@@ -83,7 +83,7 @@ class CompanyResourceTest {
   }
 
   @Test
-  public void findByUuid_notFound() throws Exception {
+  public void findById_notFound() throws Exception {
     long id = 0;
     when(companyService.findById(id)).thenReturn(Optional.empty());
 
