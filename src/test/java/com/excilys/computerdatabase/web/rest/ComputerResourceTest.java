@@ -11,8 +11,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.excilys.computerdatabase.repository.CompanyRepository;
-import com.excilys.computerdatabase.repository.ComputerRepository;
 import com.excilys.computerdatabase.service.ComputerService;
 import com.excilys.computerdatabase.service.dto.CompanyDto;
 import com.excilys.computerdatabase.service.dto.ComputerDto;
@@ -34,138 +32,132 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ComputerResource.class)
 class ComputerResourceTest {
-    private static final CompanyDto COMPANY_DTO =
-        new CompanyDto(1L, "c-name");
+  private static final CompanyDto COMPANY_DTO =
+      new CompanyDto(1L, "c-name");
 
-    private static final ComputerDto COMPUTER_DTO =
-        new ComputerDto(1L, "name", Instant.now(), null, COMPANY_DTO);
+  private static final ComputerDto COMPUTER_DTO =
+      new ComputerDto(1L, "name", Instant.now(), null, COMPANY_DTO);
 
-    @Autowired
-    private ObjectMapper objectMapper;
+  @Autowired
+  private ObjectMapper objectMapper;
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired
+  private MockMvc mockMvc;
 
-    @MockBean
-    private ComputerService computerService;
+  @MockBean
+  private ComputerService computerService;
 
-    @MockBean
-    private CompanyRepository companyRepository;
+  @Test
+  void findAll() throws Exception {
+    when(computerService.find(any())).thenReturn(new PageImpl<>(List.of(COMPUTER_DTO)));
 
-    @MockBean
-    private ComputerRepository computerRepository;
-
-    @Test
-    public void findAll() throws Exception {
-        when(computerService.find(any())).thenReturn(new PageImpl<>(List.of(COMPUTER_DTO)));
-
-        MockHttpServletRequestBuilder builder =
-            get("/api/v1/computers")
-                .contentType(MediaType.APPLICATION_JSON);
-
-        mockMvc.perform(builder)
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.size", is(1)))
-            .andExpect(jsonPath("$.totalPages", is(1)))
-            .andExpect(jsonPath("$.totalElements", is(1)))
-            .andExpect(jsonPath("$.content[0].id", is(1)))
-            .andExpect(jsonPath("$.content[0].name", is("name")))
-            .andExpect(jsonPath("$.content[0].company.id", is(1)))
-            .andExpect(jsonPath("$.content[0].company.name", is("c-name")));
-    }
-
-    @Test
-    public void findById() throws Exception {
-        long id = 1L;
-        when(computerService.findById(id)).thenReturn(Optional.of(COMPUTER_DTO));
-
-        MockHttpServletRequestBuilder builder =
-            get("/api/v1/computers/{id}", id)
-                .contentType(MediaType.APPLICATION_JSON);
-
-        mockMvc.perform(builder)
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is(1)))
-            .andExpect(jsonPath("$.name", is("name")))
-            .andExpect(jsonPath("$.company.id", is(1)))
-            .andExpect(jsonPath("$.company.name", is("c-name")));
-    }
-
-    @Test
-    public void findById_notFound() throws Exception {
-        long id = 1;
-        when(computerService.findById(id)).thenReturn(Optional.empty());
-
-        MockHttpServletRequestBuilder builder = get("/api/v1/computers/{id}", id)
+    MockHttpServletRequestBuilder builder =
+        get("/api/v1/computers")
             .contentType(MediaType.APPLICATION_JSON);
 
-        mockMvc.perform(builder)
-            .andExpect(status().isNotFound());
-    }
+    mockMvc.perform(builder)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.size", is(1)))
+        .andExpect(jsonPath("$.totalPages", is(1)))
+        .andExpect(jsonPath("$.totalElements", is(1)))
+        .andExpect(jsonPath("$.content[0].id", is(1)))
+        .andExpect(jsonPath("$.content[0].name", is("name")))
+        .andExpect(jsonPath("$.content[0].company.id", is(1)))
+        .andExpect(jsonPath("$.content[0].company.name", is("c-name")));
+  }
 
-    @Test
-    public void create_withoutName() throws Exception {
-        ComputerDto computerDtoToSave = ComputerDto.builder().build();
+  @Test
+  void findById() throws Exception {
+    long id = 1L;
+    when(computerService.findById(id)).thenReturn(Optional.of(COMPUTER_DTO));
 
-        MockHttpServletRequestBuilder builder = post("/api/v1/computers")
-            .content(objectMapper.writeValueAsString(computerDtoToSave))
+    MockHttpServletRequestBuilder builder =
+        get("/api/v1/computers/{id}", id)
             .contentType(MediaType.APPLICATION_JSON);
 
-        mockMvc.perform(builder)
-            .andExpect(status().isBadRequest());
-    }
+    mockMvc.perform(builder)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id", is(1)))
+        .andExpect(jsonPath("$.name", is("name")))
+        .andExpect(jsonPath("$.company.id", is(1)))
+        .andExpect(jsonPath("$.company.name", is("c-name")));
+  }
 
-    @Test
-    public void create() throws Exception {
-        ComputerDto computerDtoToSave =
-            ComputerDto.builder().name("name").introduced(Instant.now()).build();
-        when(computerService.save(computerDtoToSave)).thenReturn(COMPUTER_DTO);
+  @Test
+  void findById_notFound() throws Exception {
+    long id = 1;
+    when(computerService.findById(id)).thenReturn(Optional.empty());
 
-        MockHttpServletRequestBuilder builder = post("/api/v1/computers")
-            .content(objectMapper.writeValueAsString(computerDtoToSave))
-            .contentType(MediaType.APPLICATION_JSON);
+    MockHttpServletRequestBuilder builder = get("/api/v1/computers/{id}", id)
+        .contentType(MediaType.APPLICATION_JSON);
 
-        mockMvc.perform(builder)
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.id", is(1)));
-    }
+    mockMvc.perform(builder)
+        .andExpect(status().isNotFound());
+  }
 
-    @Test
-    public void update_withoutName() throws Exception {
-        long id = 1;
-        ComputerDto computerDtoToSave = ComputerDto.builder().id(id).build();
+  @Test
+  void create_withoutName() throws Exception {
+    ComputerDto computerDtoToSave = ComputerDto.builder().build();
 
-        MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", id)
-            .content(objectMapper.writeValueAsString(computerDtoToSave))
-            .contentType(MediaType.APPLICATION_JSON);
+    MockHttpServletRequestBuilder builder = post("/api/v1/computers")
+        .content(objectMapper.writeValueAsString(computerDtoToSave))
+        .contentType(MediaType.APPLICATION_JSON);
 
-        mockMvc.perform(builder)
-            .andExpect(status().isBadRequest());
-    }
+    mockMvc.perform(builder)
+        .andExpect(status().isBadRequest());
+  }
 
-    @Test
-    public void update() throws Exception {
-        when(computerService.save(COMPUTER_DTO)).thenReturn(COMPUTER_DTO);
+  @Test
+  void create() throws Exception {
+    ComputerDto computerDtoToSave =
+        ComputerDto.builder().name("name").introduced(Instant.now()).build();
+    when(computerService.save(computerDtoToSave)).thenReturn(COMPUTER_DTO);
 
-        MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", 1)
-            .content(objectMapper.writeValueAsString(COMPUTER_DTO))
-            .contentType(MediaType.APPLICATION_JSON);
+    MockHttpServletRequestBuilder builder = post("/api/v1/computers")
+        .content(objectMapper.writeValueAsString(computerDtoToSave))
+        .contentType(MediaType.APPLICATION_JSON);
 
-        mockMvc.perform(builder)
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is(1)))
-            .andExpect(jsonPath("$.name", is("name")));
-    }
+    mockMvc.perform(builder)
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id", is(1)));
+  }
 
-    @Test
-    public void deleteById() throws Exception {
-        long id = 1;
-        MockHttpServletRequestBuilder builder = delete("/api/v1/computers/{id}", id)
-            .contentType(MediaType.APPLICATION_JSON);
+  @Test
+  void update_withoutName() throws Exception {
+    long id = 1;
+    ComputerDto computerDtoToSave = ComputerDto.builder().id(id).build();
 
-        mockMvc.perform(builder)
-            .andExpect(status().isAccepted());
+    MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", id)
+        .content(objectMapper.writeValueAsString(computerDtoToSave))
+        .contentType(MediaType.APPLICATION_JSON);
 
-        verify(computerService).delete(id);
-    }
+    mockMvc.perform(builder)
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void update() throws Exception {
+    when(computerService.save(COMPUTER_DTO)).thenReturn(COMPUTER_DTO);
+
+    MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", 1)
+        .content(objectMapper.writeValueAsString(COMPUTER_DTO))
+        .contentType(MediaType.APPLICATION_JSON);
+
+    mockMvc.perform(builder)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id", is(1)))
+        .andExpect(jsonPath("$.name", is("name")));
+  }
+
+  @Test
+  void deleteById() throws Exception {
+    long id = 1;
+    MockHttpServletRequestBuilder builder = delete("/api/v1/computers/{id}", id)
+        .contentType(MediaType.APPLICATION_JSON);
+
+    mockMvc.perform(builder)
+        .andExpect(status().isAccepted());
+
+    verify(computerService).delete(id);
+  }
 }

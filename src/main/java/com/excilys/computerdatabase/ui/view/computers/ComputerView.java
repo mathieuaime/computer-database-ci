@@ -22,7 +22,7 @@ import org.springframework.util.StringUtils;
 @Route(value = "", layout = MainLayout.class)
 @PageTitle("Computers | Computer Database")
 public class ComputerView extends VerticalLayout {
-  private final ComputerService computerService;
+  private final transient ComputerService computerService;
 
   private final Grid<ComputerDto> grid;
   private final TextField filter;

@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest
 @AutoConfigureMockMvc
 class ComputerResourceIT {
-
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -39,7 +38,7 @@ class ComputerResourceIT {
   private ComputerRepository computerRepository;
 
   @Test
-  public void findById() throws Exception {
+  void findById() throws Exception {
     long id = 1;
 
     MockHttpServletRequestBuilder builder =
@@ -59,7 +58,7 @@ class ComputerResourceIT {
   }
 
   @Test
-  public void create() throws Exception {
+  void create() throws Exception {
     long dbSizeBeforeCreation = computerRepository.count();
 
     CompanyDto companyDto = CompanyDto.builder().id(1L).build();
@@ -88,7 +87,7 @@ class ComputerResourceIT {
   }
 
   @Test
-  public void update() throws Exception {
+  void update() throws Exception {
     Company company = new Company().setId(1L);
 
     Computer created =

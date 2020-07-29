@@ -14,30 +14,30 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class CompanyServiceTest {
-    @Mock
-    private CompanyRepository companyRepository;
+  @Mock
+  private CompanyRepository companyRepository;
 
-    @InjectMocks
-    private CompanyService companyService;
+  @InjectMocks
+  private CompanyService companyService;
 
-    @Test
-    void findByUuid_notFound() {
-        long id = 0;
-        when(companyRepository.findById(id, CompanyDto.class)).thenReturn(Optional.empty());
+  @Test
+  void findByUuid_notFound() {
+    long id = 0;
+    when(companyRepository.findById(id, CompanyDto.class)).thenReturn(Optional.empty());
 
-        Optional<CompanyDto> optCompany = companyService.findById(id);
+    Optional<CompanyDto> optCompany = companyService.findById(id);
 
-        assertThat(optCompany).isEmpty();
-    }
+    assertThat(optCompany).isEmpty();
+  }
 
-    @Test
-    void findByUuid() {
-        long id = 1;
-        CompanyDto companyDto = new CompanyDto(id, "name");
-        when(companyRepository.findById(id, CompanyDto.class)).thenReturn(Optional.of(companyDto));
+  @Test
+  void findByUuid() {
+    long id = 1;
+    CompanyDto companyDto = new CompanyDto(id, "name");
+    when(companyRepository.findById(id, CompanyDto.class)).thenReturn(Optional.of(companyDto));
 
-        Optional<CompanyDto> optCompany = companyService.findById(id);
+    Optional<CompanyDto> optCompany = companyService.findById(id);
 
-        assertThat(optCompany).contains(companyDto);
-    }
+    assertThat(optCompany).contains(companyDto);
+  }
 }

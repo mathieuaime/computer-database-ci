@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 @SpringBootTest
 @AutoConfigureMockMvc
 class CompanyResourceIT {
-
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -26,7 +25,7 @@ class CompanyResourceIT {
   private MockMvc mockMvc;
 
   @Test
-  public void findByUuid() throws Exception {
+  void findByUuid() throws Exception {
     MockHttpServletRequestBuilder builder =
         get("/api/v1/companies/{id}", 1)
             .contentType(MediaType.APPLICATION_JSON);
@@ -44,7 +43,7 @@ class CompanyResourceIT {
   }
 
   @Test
-  public void findByUuid_notFound() throws Exception {
+  void findByUuid_notFound() throws Exception {
     MockHttpServletRequestBuilder builder = get("/api/v1/companies/{id}", 0)
         .contentType(MediaType.APPLICATION_JSON);
 

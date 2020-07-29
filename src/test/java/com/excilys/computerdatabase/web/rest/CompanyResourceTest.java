@@ -8,8 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.excilys.computerdatabase.repository.CompanyRepository;
-import com.excilys.computerdatabase.repository.ComputerRepository;
 import com.excilys.computerdatabase.service.CompanyService;
 import com.excilys.computerdatabase.service.ComputerService;
 import com.excilys.computerdatabase.service.dto.CompanyDto;
@@ -44,14 +42,8 @@ class CompanyResourceTest {
   @MockBean
   private ComputerService computerService;
 
-  @MockBean
-  private CompanyRepository companyRepository;
-
-  @MockBean
-  private ComputerRepository computerRepository;
-
   @Test
-  public void findAll() throws Exception {
+  void findAll() throws Exception {
     when(companyService.find(any())).thenReturn(new PageImpl<>(List.of(COMPANY_DTO)));
 
     MockHttpServletRequestBuilder builder =
@@ -68,7 +60,7 @@ class CompanyResourceTest {
   }
 
   @Test
-  public void findById() throws Exception {
+  void findById() throws Exception {
     long id = 1;
     when(companyService.findById(id)).thenReturn(Optional.of(COMPANY_DTO));
 
@@ -83,7 +75,7 @@ class CompanyResourceTest {
   }
 
   @Test
-  public void findById_notFound() throws Exception {
+  void findById_notFound() throws Exception {
     long id = 0;
     when(companyService.findById(id)).thenReturn(Optional.empty());
 
@@ -95,7 +87,7 @@ class CompanyResourceTest {
   }
 
   @Test
-  public void findComputers() throws Exception {
+  void findComputers() throws Exception {
     long id = 1;
     when(computerService.findByCompany(eq(id), any()))
         .thenReturn(new PageImpl<>(List.of(COMPUTER_DTO)));
