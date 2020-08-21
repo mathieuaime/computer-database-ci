@@ -1,5 +1,6 @@
 package com.excilys.computerdatabase.web.rest;
 
+import static java.time.Instant.now;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -11,15 +12,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.excilys.computerdatabase.model.Computer;
 import com.excilys.computerdatabase.service.ComputerService;
-import com.excilys.computerdatabase.service.dto.CompanyDto;
-import com.excilys.computerdatabase.service.dto.ComputerDto;
+import com.excilys.computerdatabase.web.dto.CompanyDto;
+import com.excilys.computerdatabase.web.dto.ComputerDto;
+import com.excilys.computerdatabase.web.mapper.ComputerMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,16 +31,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ComputerResource.class)
 class ComputerResourceTest {
-  private static final CompanyDto COMPANY_DTO =
-      new CompanyDto(1L, "c-name");
+  private static final CompanyDto COMPANY_DTO = CompanyDto.builder().id(1L).name("c-name").build();
 
   private static final ComputerDto COMPUTER_DTO =
-      new ComputerDto(1L, "name", Instant.now(), null, COMPANY_DTO);
+      ComputerDto.builder().id(1L).name("name").introduced(now()).company(COMPANY_DTO).build();
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -47,11 +49,23 @@ class ComputerResourceTest {
   @MockBean
   private ComputerService computerService;
 
+  @MockBean
+  private ComputerMapper computerMapper;
+
+  @Mock
+  private Computer computer;
+
+  @BeforeEach
+  void setUp() {
+    when(computerMapper.toDto(computer)).thenReturn(COMPUTER_DTO);
+    when(computerMapper.toModel(COMPUTER_DTO)).thenReturn(computer);
+  }
+
   @Test
   void findAll() throws Exception {
-    when(computerService.find(any())).thenReturn(new PageImpl<>(List.of(COMPUTER_DTO)));
+    when(computerService.find(any())).thenReturn(new PageImpl<>(List.of(computer)));
 
-    MockHttpServletRequestBuilder builder =
+    var builder =
         get("/api/v1/computers")
             .contentType(MediaType.APPLICATION_JSON);
 
@@ -69,9 +83,9 @@ class ComputerResourceTest {
   @Test
   void findById() throws Exception {
     long id = 1L;
-    when(computerService.findById(id)).thenReturn(Optional.of(COMPUTER_DTO));
+    when(computerService.findById(id)).thenReturn(Optional.of(computer));
 
-    MockHttpServletRequestBuilder builder =
+    var builder =
         get("/api/v1/computers/{id}", id)
             .contentType(MediaType.APPLICATION_JSON);
 
@@ -88,7 +102,7 @@ class ComputerResourceTest {
     long id = 1;
     when(computerService.findById(id)).thenReturn(Optional.empty());
 
-    MockHttpServletRequestBuilder builder = get("/api/v1/computers/{id}", id)
+    var builder = get("/api/v1/computers/{id}", id)
         .contentType(MediaType.APPLICATION_JSON);
 
     mockMvc.perform(builder)
@@ -96,11 +110,11 @@ class ComputerResourceTest {
   }
 
   @Test
-  void create_withoutName() throws Exception {
-    ComputerDto computerDtoToSave = ComputerDto.builder().build();
+  void create_withoutMandatoryAttributes() throws Exception {
+    var computerDtoToSave = "{}";
 
-    MockHttpServletRequestBuilder builder = post("/api/v1/computers")
-        .content(objectMapper.writeValueAsString(computerDtoToSave))
+    var builder = post("/api/v1/computers")
+        .content(computerDtoToSave)
         .contentType(MediaType.APPLICATION_JSON);
 
     mockMvc.perform(builder)
@@ -109,11 +123,14 @@ class ComputerResourceTest {
 
   @Test
   void create() throws Exception {
-    ComputerDto computerDtoToSave =
-        ComputerDto.builder().name("name").introduced(Instant.now()).build();
-    when(computerService.save(computerDtoToSave)).thenReturn(COMPUTER_DTO);
+    var computerDtoToSave =
+        ComputerDto.builder().name("name").introduced(now()).build();
 
-    MockHttpServletRequestBuilder builder = post("/api/v1/computers")
+    when(computerMapper.toModel(computerDtoToSave)).thenReturn(computer);
+
+    when(computerService.save(computer)).thenReturn(computer);
+
+    var builder = post("/api/v1/computers")
         .content(objectMapper.writeValueAsString(computerDtoToSave))
         .contentType(MediaType.APPLICATION_JSON);
 
@@ -123,12 +140,12 @@ class ComputerResourceTest {
   }
 
   @Test
-  void update_withoutName() throws Exception {
+  void update_withoutMandatoryAttributes() throws Exception {
     long id = 1;
-    ComputerDto computerDtoToSave = ComputerDto.builder().id(id).build();
+    var computerDtoToSave = "{}";
 
-    MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", id)
-        .content(objectMapper.writeValueAsString(computerDtoToSave))
+    var builder = put("/api/v1/computers/{id}", id)
+        .content(computerDtoToSave)
         .contentType(MediaType.APPLICATION_JSON);
 
     mockMvc.perform(builder)
@@ -137,10 +154,10 @@ class ComputerResourceTest {
 
   @Test
   void update_withoutId() throws Exception {
-    ComputerDto computerDtoToSave =
-        ComputerDto.builder().name("name").introduced(Instant.now()).build();
+    var computerDtoToSave =
+        ComputerDto.builder().name("name").introduced(now()).build();
 
-    MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", 1)
+    var builder = put("/api/v1/computers/{id}", 1)
         .content(objectMapper.writeValueAsString(computerDtoToSave))
         .contentType(MediaType.APPLICATION_JSON);
 
@@ -150,9 +167,9 @@ class ComputerResourceTest {
 
   @Test
   void update() throws Exception {
-    when(computerService.save(COMPUTER_DTO)).thenReturn(COMPUTER_DTO);
+    when(computerService.save(computer)).thenReturn(computer);
 
-    MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", 1)
+    var builder = put("/api/v1/computers/{id}", 1)
         .content(objectMapper.writeValueAsString(COMPUTER_DTO))
         .contentType(MediaType.APPLICATION_JSON);
 
@@ -165,12 +182,11 @@ class ComputerResourceTest {
   @Test
   void deleteById() throws Exception {
     long id = 1;
-    MockHttpServletRequestBuilder builder = delete("/api/v1/computers/{id}", id)
-        .contentType(MediaType.APPLICATION_JSON);
+    var builder = delete("/api/v1/computers/{id}", id).contentType(MediaType.APPLICATION_JSON);
 
     mockMvc.perform(builder)
         .andExpect(status().isAccepted());
 
-    verify(computerService).delete(id);
+    verify(computerService).deleteById(id);
   }
 }

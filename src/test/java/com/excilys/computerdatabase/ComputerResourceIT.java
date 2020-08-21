@@ -7,22 +7,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.excilys.computerdatabase.model.Company;
-import com.excilys.computerdatabase.model.Computer;
-import com.excilys.computerdatabase.repository.ComputerRepository;
-import com.excilys.computerdatabase.service.dto.CompanyDto;
-import com.excilys.computerdatabase.service.dto.ComputerDto;
+import com.excilys.computerdatabase.persistence.repository.ComputerRepository;
+import com.excilys.computerdatabase.persistence.entity.CompanyEntity;
+import com.excilys.computerdatabase.persistence.entity.ComputerEntity;
+import com.excilys.computerdatabase.web.dto.CompanyDto;
+import com.excilys.computerdatabase.web.dto.ComputerDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 @SpringBootTest
@@ -41,16 +38,16 @@ class ComputerResourceIT {
   void findById() throws Exception {
     long id = 1;
 
-    MockHttpServletRequestBuilder builder =
+    var builder =
         get("/api/v1/computers/{id}", id)
             .contentType(MediaType.APPLICATION_JSON);
 
-    MockHttpServletResponse response = mockMvc.perform(builder)
+    var response = mockMvc.perform(builder)
         .andExpect(MockMvcResultMatchers.status().isOk())
         .andReturn()
         .getResponse();
 
-    ComputerDto computerReturned = objectMapper
+    var computerReturned = objectMapper
         .readValue(response.getContentAsString(), ComputerDto.class);
 
     assertThat(computerReturned.getId()).isEqualTo(id);
@@ -61,50 +58,51 @@ class ComputerResourceIT {
   void create() throws Exception {
     long dbSizeBeforeCreation = computerRepository.count();
 
-    CompanyDto companyDto = CompanyDto.builder().id(1L).build();
-    ComputerDto computerDtoToSave =
+    var companyDto = CompanyDto.builder().id(1L).name("Company").build();
+    var computerDtoToSave =
         ComputerDto.builder().name("name").introduced(Instant.now()).company(companyDto).build();
 
-    MockHttpServletRequestBuilder builder = post("/api/v1/computers")
+    var builder = post("/api/v1/computers")
         .content(objectMapper.writeValueAsString(computerDtoToSave))
         .contentType(MediaType.APPLICATION_JSON);
 
-    MockHttpServletResponse response = mockMvc.perform(builder)
+    var response = mockMvc.perform(builder)
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse();
 
-    ComputerDto computerReturned = objectMapper
+    var computerReturned = objectMapper
         .readValue(response.getContentAsString(), ComputerDto.class);
 
     long dbSizeAfterCreation = computerRepository.count();
 
     assertThat(dbSizeAfterCreation).isEqualTo(dbSizeBeforeCreation + 1);
 
-    Optional<Computer> optComputer = computerRepository.findById(computerReturned.getId());
+    var optComputer = computerRepository.findById(computerReturned.getId());
 
-    assertThat(optComputer).map(Computer::getName).contains("name");
+    assertThat(optComputer).map(ComputerEntity::getName).contains("name");
   }
 
   @Test
   void update() throws Exception {
-    Company company = new Company().setId(1L);
+    var company = new CompanyEntity().setId(1L);
 
-    Computer created =
-        new Computer().setName("name-to-update").setIntroduced(Instant.now()).setCompany(company);
+    var created =
+        new ComputerEntity().setName("name-to-update").setIntroduced(Instant.now())
+            .setCompany(company);
     computerRepository.save(created);
 
     long dbSizeBeforeCreation = computerRepository.count();
 
-    CompanyDto companyDto = CompanyDto.builder().id(1L).build();
-    ComputerDto computerDtoToSave = ComputerDto.builder()
+    var companyDto = CompanyDto.builder().id(1L).name("Company").build();
+    var computerDtoToSave = ComputerDto.builder()
         .id(created.getId())
         .name("name-updated")
         .introduced(Instant.now())
         .company(companyDto)
         .build();
 
-    MockHttpServletRequestBuilder builder = put("/api/v1/computers/{id}", created.getId())
+    var builder = put("/api/v1/computers/{id}", created.getId())
         .content(objectMapper.writeValueAsString(computerDtoToSave))
         .contentType(MediaType.APPLICATION_JSON);
 
@@ -115,9 +113,10 @@ class ComputerResourceIT {
 
     assertThat(dbSizeAfterCreation).isEqualTo(dbSizeBeforeCreation);
 
-    Optional<Computer> optComputer = computerRepository.findById(created.getId());
+    var optComputer = computerRepository
+        .findById(created.getId());
 
-    assertThat(optComputer).map(Computer::getName).contains("name-updated");
+    assertThat(optComputer).map(ComputerEntity::getName).contains("name-updated");
   }
 
   @Test
@@ -126,7 +125,7 @@ class ComputerResourceIT {
 
     long dbSizeBeforeDeletion = computerRepository.count();
 
-    MockHttpServletRequestBuilder builder = delete("/api/v1/computers/{id}", id);
+    var builder = delete("/api/v1/computers/{id}", id);
 
     mockMvc.perform(builder)
         .andExpect(status().isAccepted());
@@ -135,7 +134,7 @@ class ComputerResourceIT {
 
     assertThat(dbSizeAfterDeletion).isEqualTo(dbSizeBeforeDeletion - 1);
 
-    Optional<Computer> optComputer = computerRepository.findById(id);
+    var optComputer = computerRepository.findById(id);
 
     assertThat(optComputer).isEmpty();
   }
@@ -146,7 +145,7 @@ class ComputerResourceIT {
 
     long dbSizeBeforeDeletion = computerRepository.count();
 
-    MockHttpServletRequestBuilder builder = delete("/api/v1/computers/{id}", id);
+    var builder = delete("/api/v1/computers/{id}", id);
 
     mockMvc.perform(builder)
         .andExpect(status().isAccepted());
@@ -155,7 +154,7 @@ class ComputerResourceIT {
 
     assertThat(dbSizeAfterDeletion).isEqualTo(dbSizeBeforeDeletion);
 
-    Optional<Computer> optComputer = computerRepository.findById(id);
+    var optComputer = computerRepository.findById(id);
 
     assertThat(optComputer).isEmpty();
   }
