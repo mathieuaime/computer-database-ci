@@ -1,5 +1,6 @@
 package com.excilys.computerdatabase.web.rest;
 
+import static java.util.List.of;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -8,15 +9,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.excilys.computerdatabase.model.Company;
+import com.excilys.computerdatabase.model.Computer;
 import com.excilys.computerdatabase.service.CompanyService;
 import com.excilys.computerdatabase.service.ComputerService;
-import com.excilys.computerdatabase.service.dto.CompanyDto;
-import com.excilys.computerdatabase.service.dto.ComputerDto;
+import com.excilys.computerdatabase.web.dto.CompanyDto;
+import com.excilys.computerdatabase.web.dto.ComputerDto;
+import com.excilys.computerdatabase.web.mapper.CompanyMapper;
+import com.excilys.computerdatabase.web.mapper.ComputerMapper;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,12 +30,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(CompanyResource.class)
 class CompanyResourceTest {
-  private static final CompanyDto COMPANY_DTO = new CompanyDto(1L, "name");
+  private static final CompanyDto COMPANY_DTO = CompanyDto.builder().id(1L).name("name").build();
   private static final ComputerDto COMPUTER_DTO =
       ComputerDto.builder().id(1L).name("c-name").introduced(Instant.now()).build();
 
@@ -42,11 +47,31 @@ class CompanyResourceTest {
   @MockBean
   private ComputerService computerService;
 
+  @MockBean
+  private CompanyMapper companyMapper;
+
+  @MockBean
+  private ComputerMapper computerMapper;
+
+  @Mock
+  private Company company;
+
+  @Mock
+  private Computer computer;
+
+  @BeforeEach
+  void setUp() {
+    when(companyMapper.toModel(COMPANY_DTO)).thenReturn(company);
+    when(companyMapper.toDto(company)).thenReturn(COMPANY_DTO);
+    when(computerMapper.toModel(COMPUTER_DTO)).thenReturn(computer);
+    when(computerMapper.toDto(computer)).thenReturn(COMPUTER_DTO);
+  }
+
   @Test
   void findAll() throws Exception {
-    when(companyService.find(any())).thenReturn(new PageImpl<>(List.of(COMPANY_DTO)));
+    when(companyService.find(any())).thenReturn(new PageImpl<>(of(company)));
 
-    MockHttpServletRequestBuilder builder =
+    var builder =
         get("/api/v1/companies")
             .contentType(MediaType.APPLICATION_JSON);
 
@@ -62,9 +87,9 @@ class CompanyResourceTest {
   @Test
   void findById() throws Exception {
     long id = 1;
-    when(companyService.findById(id)).thenReturn(Optional.of(COMPANY_DTO));
+    when(companyService.findById(id)).thenReturn(Optional.of(company));
 
-    MockHttpServletRequestBuilder builder =
+    var builder =
         get("/api/v1/companies/{id}", id)
             .contentType(MediaType.APPLICATION_JSON);
 
@@ -79,7 +104,7 @@ class CompanyResourceTest {
     long id = 0;
     when(companyService.findById(id)).thenReturn(Optional.empty());
 
-    MockHttpServletRequestBuilder builder =
+    var builder =
         get("/api/v1/companies/{id}", id)
             .contentType(MediaType.APPLICATION_JSON);
 
@@ -89,10 +114,9 @@ class CompanyResourceTest {
   @Test
   void findComputers() throws Exception {
     long id = 1;
-    when(computerService.findByCompany(eq(id), any()))
-        .thenReturn(new PageImpl<>(List.of(COMPUTER_DTO)));
+    when(computerService.findByCompany(eq(id), any())).thenReturn(new PageImpl<>(of(computer)));
 
-    MockHttpServletRequestBuilder builder =
+    var builder =
         get("/api/v1/companies/{id}/computers", id)
             .contentType(MediaType.APPLICATION_JSON);
 

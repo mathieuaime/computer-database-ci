@@ -1,61 +1,23 @@
 package com.excilys.computerdatabase.model;
 
-import java.util.Objects;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.google.auto.value.AutoValue;
 
-@Entity
-public class Company {
+@AutoValue
+public abstract class Company {
+    public abstract Long getId();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    public abstract String getName();
 
-    private String name;
-
-    public Long getId() {
-        return id;
+    public static Builder builder() {
+        return new AutoValue_Company.Builder();
     }
 
-    public Company setId(Long id) {
-        this.id = id;
-        return this;
-    }
+    @AutoValue.Builder
+    public static abstract class Builder {
+        public abstract Builder id(Long id);
 
-    public String getName() {
-        return name;
-    }
+        public abstract Builder name(String name);
 
-    public Company setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Company company = (Company) o;
-        return Objects.equals(id, company.id) &&
-            Objects.equals(name, company.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
-
-    @Override
-    public String toString() {
-        return "Company{" +
-            "uuid='" + id + '\'' +
-            ", name='" + name + '\'' +
-            '}';
+        public abstract Company build();
     }
 }

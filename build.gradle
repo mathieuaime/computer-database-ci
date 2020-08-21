@@ -8,15 +8,14 @@ plugins {
 repositories {
     mavenCentral()
     mavenLocal()
-    maven { url "https://maven.vaadin.com/vaadin-addons" }
 }
 
 ext {
     hibernateValidatorVersion = "6.1.5.Final"
     mapstructVersion = "1.3.1.Final"
-    vaadinBomVersion = "16.0.1"
     seleniumVersion = "3.4.0"
-    liquibaseVersion = '4.0.0'
+    liquibaseVersion = "4.0.0"
+    autoValueVersion = "1.6"
 }
 
 group = 'com.excilys'
@@ -24,25 +23,26 @@ version = '0.0.1-SNAPSHOT'
 description = 'computer-database'
 sourceCompatibility = '13'
 
-dependencyManagement {
-    imports {
-        mavenBom "com.vaadin:vaadin-bom:${vaadinBomVersion}"
-    }
-}
-
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "org.hibernate.validator:hibernate-validator:${hibernateValidatorVersion}"
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
-    implementation 'com.vaadin:vaadin-spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     runtimeOnly 'com.h2database:h2'
 
     implementation "org.liquibase:liquibase-core:${liquibaseVersion}"
+
+    compile "com.google.auto.value:auto-value-annotations:${autoValueVersion}"
+    annotationProcessor "com.google.auto.value:auto-value:${autoValueVersion}"
+
+    implementation "javax.annotation:javax.annotation-api:1.3.2"
+    implementation "com.google.code.findbugs:jsr305:3.0.0"
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
