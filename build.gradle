@@ -48,7 +48,7 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 
-    testCompile("io.github.bonigarcia:selenium-jupiter:3.3.4")
+    testCompile("io.github.bonigarcia:selenium-jupiter:3.3.5")
     testCompile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.141.59'
 }
 
