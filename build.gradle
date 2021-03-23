@@ -15,7 +15,7 @@ ext {
     mapstructVersion = "1.4.1.Final"
     seleniumVersion = "3.4.0"
     liquibaseVersion = "4.1.1"
-    autoValueVersion = "1.7.4"
+    autoValueVersion = "1.7.5"
 }
 
 group = 'com.excilys'
