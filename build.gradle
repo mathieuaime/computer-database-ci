@@ -1,6 +1,6 @@
 plugins {
     id 'org.springframework.boot' version '2.3.4.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'jacoco'
     id 'java'
 }
@@ -12,9 +12,9 @@ repositories {
 
 ext {
     hibernateValidatorVersion = "6.1.6.Final"
-    mapstructVersion = "1.4.1.Final"
+    mapstructVersion = "1.4.2.Final"
     seleniumVersion = "3.4.0"
-    liquibaseVersion = "4.1.1"
+    liquibaseVersion = "4.3.2"
     autoValueVersion = "1.8"
 }
 
@@ -48,7 +48,7 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 
-    testCompile("io.github.bonigarcia:selenium-jupiter:3.3.5")
+    testCompile("io.github.bonigarcia:selenium-jupiter:3.4.0")
     testCompile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.141.59'
 }
 
