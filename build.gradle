@@ -14,7 +14,7 @@ ext {
     hibernateValidatorVersion = "7.0.1.Final"
     mapstructVersion = "1.4.2.Final"
     seleniumVersion = "3.4.0"
-    liquibaseVersion = "4.3.5"
+    liquibaseVersion = "4.6.1"
     autoValueVersion = "1.8.1"
 }
 
