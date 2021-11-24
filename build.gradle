@@ -49,7 +49,7 @@ dependencies {
     }
 
     testCompile("io.github.bonigarcia:selenium-jupiter:3.4.0")
-    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '3.141.59'
+    testCompile group: 'org.seleniumhq.selenium', name: 'selenium-chrome-driver', version: '4.1.0'
 }
 
 test {
