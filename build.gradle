@@ -11,7 +11,7 @@ repositories {
 }
 
 ext {
-    hibernateValidatorVersion = "7.0.1.Final"
+    hibernateValidatorVersion = "7.0.5.Final"
     mapstructVersion = "1.4.2.Final"
     seleniumVersion = "3.4.0"
     liquibaseVersion = "4.6.2"
